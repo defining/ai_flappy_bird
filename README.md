@@ -6,7 +6,7 @@
   1. pip3 install -r requirements.txt
   2. python3 flappy_birds.py
 ```
-### OR with virtual environnements whithout installing libraries
+### OR with virtual environnements without installing libraries
 ```
   1. source venv/bin/activate
   2. python flappy_birds.py
