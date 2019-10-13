@@ -1,7 +1,7 @@
 import os
 import pygame
-#import neat
-#import random
+import neat
+import random
 import time
 pygame.init()
 WIN_WIDTH = 500
@@ -87,30 +87,106 @@ class Bird:
         # Affichage: on fait la rotation et on le place à l'endroit de new_rect
 
     def get_mask(self):
-        return pygame.mask.from_surface(self.img)
+        return pygame.mask.from_surface(self.img) #A mask is the "space" that an object can take
 
+class Pipe:
+    GAP = 200 #Size of the gape between 2 pipe
+    VEL = 5 #Velocity between pipe and the bird
 
-def draw_window(win, bird):
+    def __init__(self, x):
+        self.x = x
+        self.height = 0
+        self.gap = 100
+
+        self.top = 0
+        self.bottom = 0
+        self.PIPE_TOP = pygame.transform.flip(PIPE_IMG, False, True)
+        self.PIPE_BOTTOM = PIPE_IMG
+
+        self.passed = False #Did the bird go trough the pipes? It will help also for ai
+        self.set_height()
+
+    def set_height(self):
+        self.height = random.randrange(50, 450) #give us the size of the top pipe 
+        self.top = self.height - self.PIPE_TOP.get_height() #how to display? The size minus the height of the pipe
+        self.bottom = self.height + self.GAP #bottom pipe
+
+    def move(self):
+        self.x -= self.VEL
+
+    def draw(self, win):
+        win.blit(self.PIPE_TOP, (self.x, self.top))
+        win.blit(self.PIPE_BOTTOM, (self.x, self.bottom))
+    
+    def collide(self, bird):
+        bird_mask = bird.get_mask()
+        top_mask = pygame.mask.from_surface(self.PIPE_TOP)
+        bottom_mask = pygame.mask.from_surface(self.PIPE_BOTTOM)
+
+        top_offset = (self.x - bird.x, self.top - round(bird.y))
+        bottom_offset = (self.x - bird.x, self.bottom - round(bird.y))
+
+        t_point = bird_mask.overlap(top_mask, top_offset) #return None if they don't collide
+        b_point = bird_mask.overlap(bottom_mask, bottom_offset)
+
+        if t_point or b_point:
+            return True #there is a collision
+        
+        return False
+
+class Base:
+    VEL = 5
+    IMG = BASE_IMG
+    WIDTH = BASE_IMG.get_width()
+
+    def __init__(self, y):
+        self.y = y
+        self.x1 = 0
+        self.x2 = self.WIDTH #it will repeat the image horizontally as soon as it has been finished
+    
+    def move(self):
+        self.x1 -= self.VEL
+        self.x2 -= self.VEL
+
+        if self.x1 + self.WIDTH < 0:
+            self.x1 = self.x2 + self.WIDTH #it means that if the BASE comes to the end of the img it has to rewind to the begin indefinitely
+        if self.x2 + self.WIDTH < 0:
+            self.x2 = self.x1 + self.WIDTH
+    
+    def draw(self, win):
+        win.blit(self.IMG, (self.x1, self.y))
+        win.blit(self.IMG, (self.x2, self.y))
+
+def draw_window(win, bird, pipes, base):
     win.blit(BG_IMG, (0, 0))
+
+    for pipe in pipes:
+        pipe.draw(win)
+    base.draw(win)
     bird.draw(win)
     pygame.display.update()
     
 
 
 def main():
-    bird = Bird(200, 200)
+    bird = Bird(230, 350)
+    base = Base(730)
+    pipes = [Pipe(700)]
     win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
     #clock = pygame.time.Clock()
 
     run = True
     while run:
-        time.sleep(0.2)
+        #time.sleep(0.2)
         #clock.tick(3000) #pour donner un tempo au jeu quelque soit l'OS mais ne marche pas
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-        bird.move()
-        draw_window(win, bird)
+        #bird.move()
+        for pipe in pipes:
+            pipe.move()
+        base.move()
+        draw_window(win, bird, pipes, base)
     pygame.quit()
     quit()
 
