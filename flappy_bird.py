@@ -56,9 +56,9 @@ class Bird:
         if d < 0 or self.y < self.height + 50:
             if self.tilt < self.MAX_ROTATION:
                 self.tilt = self.MAX_ROTATION
-            else:
-                if self.tilt > -90:
-                    self.tilt -= self.ROT_VEL
+        else:
+            if self.tilt > -90:
+                self.tilt -= self.ROT_VEL
 
     def draw(self, win):
         self.img_count += 1
@@ -100,11 +100,12 @@ def draw_window(win, bird):
 def main():
     bird = Bird(200, 200)
     win = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-    clock = pygame.time.Clock()
+    #clock = pygame.time.Clock()
 
     run = True
     while run:
-        #clock.tick(30) #pour donner un tempo au jeu quelque soit l'OS
+        time.sleep(0.2)
+        #clock.tick(3000) #pour donner un tempo au jeu quelque soit l'OS mais ne marche pas
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
