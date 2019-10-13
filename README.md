@@ -1,11 +1,12 @@
-# ai_flappy_birds
+# AI and Flappy Birds
 
-## From the CLI in the project folder
+## FROM the project folder
+###  by installing libraries
 ```
   1. pip3 install -r requirements.txt
   2. python3 flappy_birds.py
 ```
-## OR with virtual environnements
+### OR with virtual environnements whithout installing libraries
 ```
   1. source venv/bin/activate
   2. python flappy_birds.py
